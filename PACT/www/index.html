@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+
+<title> PACT Grapher </title>
+<style>
+  form * {
+    display: block;
+    margin: 10px;
+  }
+
+  body {
+    font: 10px sans-serif;
+    shape-rendering: crispEdges;
+  }
+
+  .grid-background {
+    fill: #ddd;
+  }
+
+  .grid line {
+    stroke: #FFFFFF;
+  }
+
+  .grid .minor line {
+    stroke-opacity: .5;
+  }
+
+  .grid text {
+    display: none;
+  }
+
+  .axis line {
+    stroke: #F00;
+  }
+
+  .axis path,
+  .axis line {
+    fill: none;
+    stroke: #888;
+  }
+
+  circle {
+    color: black;
+  }
+
+  button {
+    background-color: #4CAF50;
+    /* Green */
+    border: none;
+    color: white;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    border-radius: 8px;
+    width: 150px;
+  }
+
+
+  .button2 {
+    background-color: #0000FF;
+  }
+
+  /* Blue */
+
+  .button3 {
+    background-color: #f44336;
+  }
+
+  /* green */
+
+  .button4 {
+    background-color: #FF0000;
+  }
+
+  /* Red */
+</style>
+
+
+
+
+<head>
+  <font size="6"> PACT Grapher </font>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.4.1/d3.min.js"></script>
+
+</head>
+
+<div>
+
+  <div id="graph">
+  </div>
+
+
+  <div>
+    <input type="text" id="text1" value="Easy">
+    <button class="button button2" id="BT1">Yes</button>
+    <button class="button button2" id="BT3">No</button>
+
+    </P>
+    <input type="text" id="text3" value="Goal">
+    <button class="button button4" id="BT5">Yes</button>
+    <button class="button button4" id="BT6">No</button>
+
+
+    <script>
+      var posx = 0;
+      var posy1 = 0;
+      var posy2 = 0;
+      var posy3 = 0;
+      var width = 900;
+      var height = 700;
+      var offset = height;
+      var lastResp1 = "";
+      var lastResp2 = "";
+
+
+      //       var margin = {top: 20, right: 20, bottom: 30, left: 40},
+      //           width = 900 - margin.left - margin.right,
+      //           height = 500 - margin.top - margin.bottom;
+
+      var RspOne = [];
+      var RspTwo = [];
+      var RspThree = [];
+      var RspCSV = [];
+      var stamp = [];
+      var Rsp1Tot = [];
+      var Rsp2Tot = [];
+      //var RspOne = ["",""];
+      var cliq1 = 0;
+      document.getElementById("BT1").addEventListener("click", function() {
+        width = width + 10;
+        cliq1 = cliq1 + 1;
+        posy1 = posy1 + 1;
+        posx = posx + 1;
+        RspOne[0] = document.getElementById("text1").value;
+        RspOne.push(posx);
+        logPoint(document.getElementById("text1").value, cliq1);
+        console.log(RspOne);
+        MkGraph("blue", posy1);
+
+        vis.append("rect")
+          .attr("class", "grid-background")
+          .attr("x", 100)
+          .attr("y", 75)
+          .attr("width", 50)
+          .attr("height", 25);
+
+        vis.append("text")
+          .attr("x", 100)
+          .attr("y", 99)
+          .text(cliq1)
+          .attr("font-family", "sans-serif")
+          .attr("font-size", "15px")
+          .attr("fill", "#0000FF");
+
+        if( lastResp1 != document.getElementById("text1").value )
+        {
+          vis.append("text")
+            .attr("x", 150)
+            .attr("y", 99)
+            .text(document.getElementById("text1").value)
+            .attr("font-family", "sans-serif")
+            .attr("font-size", "15px")
+            .attr("fill", "#0000FF");
+         }
+          lastResp1 = document.getElementById("text1").value;
+      });
+
+      var cliq2 = 0;
+
+      var cliq3 = 0;
+      document.getElementById("BT3").addEventListener("click", function() {
+        cliq3 = cliq3 + 1;
+        posx = posx + 1;
+        logPoint("No " + document.getElementById("text1").value, cliq3);
+        MkGraph("blue", posy1);
+      });
+
+      var cliq4 = 0;
+
+      var cliq5 = 0;
+      document.getElementById("BT5").addEventListener("click", function() {
+        cliq5 = cliq5 + 1;
+        posy3 = posy3 + 1;
+        posx = posx + 1;
+        RspThree[0] = document.getElementById("text3").value;
+        RspThree.push(posx);
+        logPoint(document.getElementById("text3").value, cliq5);
+        console.log(RspThree);
+        MkGraph("#FF0000", posy3);
+
+        vis.append("rect")
+          .attr("class", "grid-background")
+          .attr("x", 100)
+          .attr("y", 125)
+          .attr("width", 50)
+          .attr("height", 25);
+
+        vis.append("text")
+          .attr("x", 100)
+          .attr("y", 149)
+          .text(cliq5)
+          .attr("font-family", "sans-serif")
+          .attr("font-size", "15px")
+          .attr("fill", "#FF0000");
+
+          if( lastResp2 != document.getElementById("text3").value )
+          {
+          vis.append("text")
+            .attr("x", 150)
+            .attr("y", 149)
+            .text(document.getElementById("text3").value)
+            .attr("font-family", "sans-serif")
+            .attr("font-size", "15px")
+            .attr("fill", "#FF0000");
+          }
+      lastResp2 = document.getElementById("text3").value;
+
+      });
+
+      var cliq6 = 0;
+      document.getElementById("BT6").addEventListener("click", function() {
+        cliq6 = cliq6 + 1;
+        posx = posx + 1;
+        logPoint("No " + document.getElementById("text3").value, cliq6);
+        MkGraph("#FF0000", posy3);
+      });
+
+
+
+
+      var vis = d3.select("#graph")
+        .append("svg")
+        .attr("width", width).attr("height", height);
+
+      vis.append("rect")
+        .attr("class", "grid-background")
+        .attr("width", (width))
+        .attr("height", (height));
+
+        MkXGrid();
+        MkYGrid();
+
+      function MkGraph(color, posy1) {
+        var nodes = [{
+          x: (posx * 10),
+          y: (offset - (posy1 * 10))
+        }]
+
+
+        vis.selectAll("circle.nodes")
+          .data(nodes)
+          .enter()
+          .append("svg:circle")
+          .attr("cx", function(d) {
+            return d.x;
+          })
+          .attr("cy", function(d) {
+            return d.y;
+          })
+          .attr("r", "5px")
+          .attr("fill", color)
+      };
+
+
+      function logPoint(PointLabel,PointTotal) {
+        var newDate = (Date.now() / 1000);
+        RspCSV.push(PointLabel);
+        Rsp1Tot.push(cliq1);
+        Rsp2Tot.push(cliq5);
+        stamp.push(newDate);
+      }
+
+
+      vis.append("line")
+        .attr("x1", 0)
+        .attr("y1", height)
+        .attr("x2", width)
+        .attr("y2", height)
+        .attr("stroke-width", 5)
+        .attr("stroke", "black");
+
+      vis.append("line")
+        .attr("x1", 0)
+        .attr("y1", 0)
+        .attr("x2", 0)
+        .attr("y2", height)
+        .attr("stroke-width", 5)
+        .attr("stroke", "black");
+
+      function MkXGrid() {
+        var step = 0;
+        while (step < (width-50)) {
+          step = step + 50;
+
+
+          vis.append("line")
+            .attr("x1", step)
+            .attr("y1", 0)
+            .attr("x2", step)
+            .attr("y2", (height - 2))
+            .attr("stroke-width", 1)
+            .attr("stroke", "white");
+          vis.append("text")
+            .attr("x", (step + 2 ))
+            .attr("y", (height - 5))
+            .text((step / 10))
+            .attr("font-family", "sans-serif")
+            .attr("font-size", "10px")
+            .attr("fill", "black");
+        }
+      }
+
+      function MkYGrid() {
+        var step = height;
+        while (step > 50) {
+          step = step - 50;
+
+
+          vis.append("line")
+            .attr("x1", 1)
+            .attr("y1", step)
+            .attr("x2", width)
+            .attr("y2", step)
+            .attr("stroke-width", 1)
+            .attr("stroke", "white");
+          vis.append("text")
+            .attr("x", 5)
+            .attr("y", (height - step - 2))
+            .text((step / 10))
+            .attr("font-family", "sans-serif")
+            .attr("font-size", "10px")
+            .attr("fill", "black");
+        }
+      }
+
+      function download(filename, text) {
+        var element = document.createElement('a');
+
+        var Inc = 0;
+        var outFile = "Unix Stamp,Response," + document.getElementById("text1").value + "," + document.getElementById("text3").value + "\n";
+        while (Inc < RspCSV.length) {
+
+          outFile = (outFile + stamp[Inc] + "," + RspCSV[Inc] + "," + Rsp1Tot[Inc] + "," + Rsp2Tot[Inc] + "\n")
+          Inc = Inc + 1;
+        }
+        outFile = outFile + "Additional Comments\n" + text
+        element.setAttribute('href', 'data:text/plain;charset=utf-8,' + outFile);
+        element.setAttribute('download', filename);
+
+        element.style.display = 'none';
+        document.body.appendChild(element);
+
+        element.click();
+
+        document.body.removeChild(element);
+      }
+
+    </script>
+
+
+
+
+
+    <form onsubmit="download(this['name'].value, this['text'].value)">
+      Filename:
+      <input type="text" name="name" value="test.csv"> Additional Comments:
+      <textarea name="text"></textarea>
+      <input type="submit" value="Download">
+    </form>

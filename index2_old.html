@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+
+<title> PACT Grapher </title>
+<style>
+
+ form * {
+  display: block;
+  margin: 10px;
+ }
+
+  body {
+    font: 10px sans-serif;
+    shape-rendering: crispEdges;
+  }
+
+  .grid-background {
+    fill: #ddd;
+  }
+
+  .grid line {
+    stroke: #FFFFFF;
+  }
+
+  .grid .minor line {
+    stroke-opacity: .5;
+  }
+
+  .grid text {
+    display: none;
+  }
+
+  .axis line {
+    stroke: #F00;
+  }
+
+  .axis path,
+  .axis line {
+    fill: none;
+    stroke: #888;
+  }
+
+  circle {
+    color: black;
+  }
+
+  button {
+    background-color: #4CAF50;
+    /* Green */
+    border: none;
+    color: white;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    border-radius: 8px;
+    width: 150px;
+  }
+
+
+  .button2 {
+    background-color: #008CBA;
+  }
+
+  /* Blue */
+
+  .button3 {
+    background-color: #f44336;
+  }
+
+  /* green */
+
+  .button4 {
+    background-color: #80FF80;
+  }
+
+  /* Red */
+</style>
+
+
+
+
+<head>
+<font size="6"> PACT Grapher </font>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.4.1/d3.min.js"></script>
+
+</head>
+
+<div>
+
+  <div id="graph">
+  </div>
+
+
+<div>
+  <input type="text" id="text1" value="Easy">
+  <button class="button button2" id="BT1">Yes</button>
+  <button class="button button2" id="BT3">No</button>
+
+</P>
+  <input type="text" id="text2" value="Easy">
+  <button class="button button3" id="BT2">Yes</button>
+  <button class="button button3" id="BT4">No</button>
+
+</P>
+  <input type="text" id="text3" value="Goal">
+  <button class="button button4" id="BT5">Yes</button>
+  <button class="button button4" id="BT6">No</button>
+
+
+    <script>
+
+      var posx = 0;
+      var posy1 = 0;
+      var posy2 = 0;
+      var posy3 = 0;
+      var width = 900,
+          height = 700;
+      var offset = height;
+
+      //       var margin = {top: 20, right: 20, bottom: 30, left: 40},
+      //           width = 900 - margin.left - margin.right,
+      //           height = 500 - margin.top - margin.bottom;
+
+var RspOne = [];
+var RspTwo = [];
+var RspThree = [];
+var RspCSV = [];
+var stamp = [];
+
+//var RspOne = ["",""];
+      var cliq1 = 0;
+      document.getElementById("BT1").addEventListener("click", function() {
+        width = width + 10;
+        cliq1 = cliq1 + 1;
+        posy1 = posy1 + 1;
+        posx = posx + 1;
+        RspOne[0] = document.getElementById("text1").value;
+        RspOne.push(posx);
+        logPoint(document.getElementById("text1").value);
+        console.log(RspOne);
+        MkGraph("blue" , posy1);
+      });
+
+      var cliq2 = 0;
+      document.getElementById("BT2").addEventListener("click", function() {
+        cliq2 = cliq2 + 1;
+        posy2 = posy2 + 1;
+        posx = posx + 1;
+        RspTwo[0] = document.getElementById("text2").value;
+        RspTwo.push(posx);
+        logPoint(document.getElementById("text2").value);
+        console.log(RspTwo);
+        MkGraph("red" , posy2);
+      });
+
+      var cliq3 = 0;
+      document.getElementById("BT3").addEventListener("click", function() {
+        cliq3 = cliq3 + 1;
+        posx = posx + 1;
+        logPoint("No " + document.getElementById("text1").value);
+        MkGraph("blue" , posy1);
+      });
+
+      var cliq4 = 0;
+      document.getElementById("BT4").addEventListener("click", function() {
+        cliq4 = cliq4 + 1;
+        //alert(cliq4);
+        posx = posx + 1;
+        logPoint("No " + document.getElementById("text2").value);
+        MkGraph("red" , posy2);
+      });
+
+      var cliq5 = 0;
+      document.getElementById("BT5").addEventListener("click", function() {
+        cliq5 = cliq5 + 1;
+        posy3 = posy3 + 1;
+        posx = posx + 1;
+        RspThree[0] = document.getElementById("text3").value;
+        RspThree.push(posx);
+        logPoint(document.getElementById("text3").value);
+        console.log(RspThree);
+        MkGraph("green",posy3);
+      });
+
+      var cliq6 = 0;
+      document.getElementById("BT6").addEventListener("click", function() {
+        cliq6 = cliq6 + 1;
+        posx = posx + 1;
+        logPoint("No " + document.getElementById("text3").value);
+        MkGraph("green",posy3);
+      });
+
+
+
+
+      var vis = d3.select("#graph")
+        .append("svg")
+        .attr("width", width).attr("height", height);
+
+      vis.append("rect")
+        .attr("class", "grid-background")
+        .attr("width", (width))
+        .attr("height", (height));
+
+
+
+
+      // Create scale
+      var scale = d3.scale.linear()
+        .domain([0, (width / 10)])
+        .range([0, width]);
+
+      // Add scales to axis
+      var x_axis = d3.svg.axis()
+        .scale(scale)
+        .ticks(10)
+        .tickSize(5)
+        .orient("bottom");
+
+      //Append group and insert axis
+      vis.append("svg")
+        .call(x_axis);
+
+
+      // Create scale
+      scale = d3.scale.linear()
+        .domain([0, (height / 10)])
+        .range([height, 0]);
+
+      // Add scales to axis
+      var y_axis = d3.svg.axis()
+        .scale(scale)
+        .orient("right")
+        .ticks(10)
+        .tickSize(5);
+
+      //Append group and insert axis
+      vis.append("svg")
+        .call(y_axis);
+
+
+      function MkGraph(color, posy1) {
+        //var svg = d3.select("svg");
+        //svg.selectAll("*").remove();
+        var nodes = [
+          {
+            x: (posx * 10),
+            y: (offset - (posy1 * 10))
+          }
+        ]
+
+
+        vis.selectAll("circle.nodes")
+          .data(nodes)
+          .enter()
+          .append("svg:circle")
+          .attr("cx", function(d) {
+            return d.x;
+          })
+          .attr("cy", function(d) {
+            return d.y;
+          })
+          .attr("r", "5px")
+          .attr("fill", color)
+      };
+
+
+function logPoint(PointLabel)
+ {
+   var newDate = (Date.now() / 1000);
+   RspCSV.push(PointLabel);
+   stamp.push(newDate);
+ }
+
+
+      function download(filename, text) {
+        var element = document.createElement('a');
+
+        var Inc = 0;
+        var outFile = "";
+        while ( Inc < RspCSV.length ){
+
+         outFile = ( outFile + stamp[Inc] + "," + RspCSV[Inc] + "\n" )
+         Inc = Inc + 1;
+        }
+        outFile = outFile + text
+        element.setAttribute('href', 'data:text/plain;charset=utf-8,' + outFile);
+        element.setAttribute('download', filename);
+
+        element.style.display = 'none';
+        document.body.appendChild(element);
+
+        element.click();
+
+        document.body.removeChild(element);
+      }
+
+
+
+    </script>
+
+    <form onsubmit="download(this['name'].value, this['text'].value)">
+      <input type="text" name="name" value="test.csv">
+
+      <input type="submit" value="Download">
+
+            <textarea name="text"></textarea>
+    </form>
